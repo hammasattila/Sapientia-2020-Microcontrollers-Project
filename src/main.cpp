@@ -1,17 +1,14 @@
-#include "EnviromentVariables.h"
-
 #include <Arduino.h>
 #include <MFRC522.h>
 #include <WiFi.h>
 
-#define PIN_CHIP_SELECT_SPI GPIO_NUM_15
-#define PIN_RFID_RESET GPIO_NUM_27
+#include "EnviromentVariables.h"
+#include "web.h"
 
-/// GLOBAL VARIABLES
 MFRC522 mfrc522(PIN_CHIP_SELECT_SPI, PIN_RFID_RESET);
 MFRC522::MIFARE_Key key;
 
-void setup() {
+    void setup() {
 
     delay(1000);
 
@@ -33,6 +30,10 @@ void setup() {
     Serial.print(F("Device's IP addres is: "));
     Serial.println(WiFi.localIP());
 
+    /// STARTING WEB SERVER
+    Serial.println(F("Starting web server."));
+    server.begin();
+
     /// INITIALIZING THE RFID READER
     Serial.println(F("Initializing SPI bus."));
     SPI.begin(GPIO_NUM_14, GPIO_NUM_12, GPIO_NUM_13, GPIO_NUM_15);
@@ -47,12 +48,13 @@ void setup() {
     Serial.println();
     Serial.println(F("#### SYSTEM READY TO GO ####"));
     Serial.println();
-
 }
 
 void loop() {
+    handleHttpRequest();
+
     if (!mfrc522.PICC_IsNewCardPresent()) {
-        // sleep(500);
+        sleep(1);
         return;
     }
 
@@ -60,5 +62,8 @@ void loop() {
         return;
     }
 
-    mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+    // mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+    mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
+    mfrc522.PICC_HaltA();
 }
+
