@@ -5,6 +5,7 @@
 #include <WiFi.h>
 
 extern WiFiServer server;
+extern bool addNextCard;
 
 void handleHttpRequest();
 void serveWebPage(WiFiClient &);
@@ -13,6 +14,7 @@ inline void beginJsonResponse(WiFiClient &client) {
 }
 void servKeys(WiFiClient &);
 void servLogs(WiFiClient &);
+void servAdd(WiFiClient &);
 void servRemove(WiFiClient &, uint8_t );
 
 #endif

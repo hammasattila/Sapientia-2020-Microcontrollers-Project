@@ -24,28 +24,39 @@
         }
     </style>
     <script>
-        window.onload = () => {
-            console.debug("Window loaded.");
-
+        logs = () => {
             fetch("api/logs")
                 .then(response => response.json())
                 .then(data => {
+                    for (const it of document.getElementsByClassName("log")) {
+                        it.remove();
+                    }
+
                     for (const it of data.logs) {
                         const card = document.createElement("div");
-                        card.className = "card";
+                        card.className = "card log";
                         card.appendChild(document.createTextNode(it.key));
                         document.getElementById("log_container").appendChild(card);
                     }
                 });
+        };
 
+        keys = () => {
             fetch("api/keys")
                 .then(response => response.json())
                 .then(data => {
+                    for (const it of document.getElementsByClassName("key")) {
+                        it.remove();
+                    }
+
                     for (const [i, it] of data.keys.entries()) {
                         const card = document.createElement("div");
-                        card.className = "card";
-                        card.appendChild(document.createTextNode(it.key));
+                        card.className = "card key";
+                        const p = document.createElement("p");
+                        p.innerText = it.key;
+                        card.appendChild(p);
                         const button = document.createElement("button");
+                        button.appendChild(document.createTextNode("Delete"));
                         button.addEventListener("click", event => {
                             fetch(`/api/remove/${i}`);
                         });
@@ -53,8 +64,26 @@
                         document.getElementById("key_container").appendChild(card);
                     }
                 });
+        };
 
+        window.onload = () => {
+            console.debug("Window loaded.");
+            logs();
+            keys();
+        };
+
+        function addNextCard() {
+            fetch("api/add")
+                .then(response => response.json())
+                .then(data => {
+                    console.debug(data);
+                });
         }
+
+        setInterval(() => {
+            keys();
+            logs();
+        }, 3000);
     </script>
 </head>
 
@@ -63,6 +92,7 @@
     <div id="key_container" class="container card">
         <h4 class="title">Keys</h4>
     </div>
+    <button onClick="addNextCard();">Add the next card</button>
     <div id="log_container" class="container card">
         <h4 class="title">Logs</h4>
     </div>

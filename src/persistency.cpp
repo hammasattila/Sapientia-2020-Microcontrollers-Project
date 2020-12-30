@@ -1,6 +1,6 @@
 #include "persistency.h"
 
-#define PERSISTENCY_LOG_KEY_COUNT 48
+#define PERSISTENCY_LOG_KEY_COUNT 40
 #define PERSISTENCY_LOG_ADDRESS_COUNT 16
 #define PERSISTENCY_LOG_ADDRESS_START 8 * PERSISTENCY_LOG_KEY_COUNT
 
@@ -42,8 +42,11 @@ bool addKey(MFRC522::Uid *uid) {
         EEPROM.write(address + i + 1, uid->uidByte[i]);
     }
 
+    Serial.println(keyCount);
+    Serial.println(keyCount + 1);
     EEPROM.write(510, keyCount + 1);
     EEPROM.commit();
+    Serial.println(EEPROM.read(510));
 
     return true;
 }

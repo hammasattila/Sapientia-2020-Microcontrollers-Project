@@ -56,13 +56,6 @@ void setup() {
     Serial.println();
     Serial.println(F("#### SYSTEM READY TO GO ####"));
     Serial.println();
-
-    // MFRC522::Uid q{
-    //     .size = 4,
-    //     .uidByte = {0xFC, 0xAC, 0xA4, 0xD1},
-    //     .sak = 0x08
-    // };
-    // addKey(&q);
 }
 
 void loop() {
@@ -79,6 +72,10 @@ void loop() {
     // mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
     mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
     saveLog(&(mfrc522.uid));
+    if(addNextCard) {
+        addKey(&(mfrc522.uid));
+        addNextCard = false;
+    }
     Serial.println(findKey(&(mfrc522.uid)) != UINT8_MAX ? "ACCEPTED" : "DENNIED");
     mfrc522.PICC_HaltA();
 }
