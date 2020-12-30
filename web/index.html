@@ -1,0 +1,71 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        html {
+            font-family: "Roboto";
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        .card {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2), 0 2px 7px 0 rgba(0, 0, 0, .19);
+            padding: 1rem;
+            transition: box-shadow .5s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19);
+        }
+    </style>
+    <script>
+        window.onload = () => {
+            console.debug("Window loaded.");
+
+            fetch("api/logs")
+                .then(response => response.json())
+                .then(data => {
+                    for (const it of data.logs) {
+                        const card = document.createElement("div");
+                        card.className = "card";
+                        card.appendChild(document.createTextNode(it.key));
+                        document.getElementById("log_container").appendChild(card);
+                    }
+                });
+
+            fetch("api/keys")
+                .then(response => response.json())
+                .then(data => {
+                    for (const [i, it] of data.keys.entries()) {
+                        const card = document.createElement("div");
+                        card.className = "card";
+                        card.appendChild(document.createTextNode(it.key));
+                        const button = document.createElement("button");
+                        button.addEventListener("click", event => {
+                            fetch(`/api/remove/${i}`);
+                        });
+                        card.appendChild(button);
+                        document.getElementById("key_container").appendChild(card);
+                    }
+                });
+
+        }
+    </script>
+</head>
+
+<body>
+    <h1 class="title">Acces Control</h1>
+    <div id="key_container" class="container card">
+        <h4 class="title">Keys</h4>
+    </div>
+    <div id="log_container" class="container card">
+        <h4 class="title">Logs</h4>
+    </div>
+</body>
+
+</html>
