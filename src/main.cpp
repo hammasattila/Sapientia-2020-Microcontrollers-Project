@@ -2,6 +2,9 @@
 #include <MFRC522.h>
 #include <WiFi.h>
 
+#include "ESPAsyncWebServer.h"
+// #include "AsyncTCP.h"
+
 #include "EnviromentVariables.h"
 #include "persistency.h"
 #include "web.h"
@@ -51,7 +54,7 @@ void setup() {
 
     /// STARTING WEB SERVER
     Serial.println(F("Starting web server."));
-    server.begin();
+    setupAsyncWebServer();
 
     Serial.println();
     Serial.println(F("#### SYSTEM READY TO GO ####"));
@@ -59,8 +62,6 @@ void setup() {
 }
 
 void loop() {
-    handleHttpRequest();
-
     if (!mfrc522.PICC_IsNewCardPresent()) {
         return;
     }

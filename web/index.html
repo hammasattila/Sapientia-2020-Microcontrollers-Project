@@ -1,7 +1,10 @@
+<!DOCTYPE html>
 <html>
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon"
+        href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAilBMVEUAAAAKlNYYms8YmM8Yms4Xmc8Yl8sXmc4Ymc8Xms8Xmc8Xk8wVldAYmM0Yms8ZmtAYmM8Ymc7////1+/2m2O3V7PYqodIcm9DN6fUzpdX7/f75/P7u+Py74vFfud4+qtYkntHg8fmy3e98xePn9ftpveBVtdxErdjD5POa0+qPzuiHyuaT0Oh0wuFw2/KGAAAAEXRSTlMABaQ6wa8f9baLWi0YlWpRSi680yMAAAJ2SURBVFjDpZfplqIwEIXRVrtdZrrvRcENUXHXfv/XGwmJBkOWOX4/OIe26zNWqooQWRn18aA/iv6P1hcMvlz/Ly+Sb1j4sIa3tNs2HPxpim/pdx8w8K9CMyCAyM4QQfRsK+gikHbUCML5bIr/xHsGNHPhHY+h5fj9ewpsefDnnxWZdy/gFsx99QCPYAe34Qc2NhSsPVUNOywZo5mg/psxrt8f1kZvwi3Y4EnKkpclDPBkTi5Q48jMSOqingXjcwhy8gBgxZv4IIa4qYDiRRBTsHzIAPxyD2QkCwDbJkHH2HXqgjGPwJTkGcCBFbVJC4sgIycoY2cAqj+eKND3pS7YUKKEKbAsL7zIHShkYWuCHjSoiGUvAzGBMaW91CTQGb1U0VaU3Z7V8sECJEAgIbmCSd9SRTeSWwAECf4ilptvYhFUiS/EdTPPSebwCEx2fLIDggSz6wEaC0rWqjYvbgFLtCyvKRkLeMcpYAWQrKasMREECvS4JSWQrXQKEix25xlKEjVT9er1C46QZMxB0UZHkje/QC746SsdV6Sqj5JGQfvV8JgMmZRgfpV7GgM4T/b1Uu5ZhzGUIOVjU7csqTVT5BLseBB3e9VqEmMeGFzlAtR3ryEomgQdWEnk7JipmK050u7AylJuKdUwyJ1T2YR8tnaqlcq0Lvjrf6ptWKCiHv/tfrQtmMCN83iXn8jQ4571uZ4EnlkHlngy9NhsFazcC7AbUjXLXPHOUz7pS8JQjzcLOvbloOt7U1h6cug7LPsP2+8Z1PKdefD9/gbJB4IYmq+K7790aVXt4Sfy0Q3ov5Y12j1hBo4g/4Z0jJdFD722tvJeZOMfahbgJcPqy1MAAAAASUVORK5CYII=">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
@@ -21,6 +24,12 @@
 
         .card:hover {
             box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19);
+        }
+
+        #log_container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
     </style>
     <script>
@@ -83,7 +92,7 @@
         setInterval(() => {
             keys();
             logs();
-        }, 3000);
+        }, 10000);
     </script>
 </head>
 
@@ -93,8 +102,9 @@
         <h4 class="title">Keys</h4>
     </div>
     <button onClick="addNextCard();">Add the next card</button>
-    <div id="log_container" class="container card">
+    <div class="container card">
         <h4 class="title">Logs</h4>
+        <div id="log_container"></div>
     </div>
 </body>
 
