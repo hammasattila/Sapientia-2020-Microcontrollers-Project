@@ -4,25 +4,44 @@
 #define PERSISTENCY_LOG_ADDRESS_COUNT 16
 #define PERSISTENCY_LOG_ADDRESS_START 8 * PERSISTENCY_LOG_KEY_COUNT
 
-void readKeysForClient(WiFiClient &client) {
-    const uint8_t keyCount = EEPROM.read(510);
+String byteToHex(const uint8_t b) {
+    String res;
+    char c;
+    c = (b >> 4) + '0';
+    if ('9' < c) {
+        c += 'A' - '9';
+    }
+    res += c;
+    c = (b & 0x0F) + '0';
+    if ('9' < c) {
+        c += 'A' - '9';
+    }
+    res += c;
 
-    client.print(F("{\"keys\": ["));
+    return res;
+}
+
+String getKeysJson() {
+    const uint8_t keyCount = EEPROM.read(510);
+    String res = "{\"keys\": [";
+
     for (uint8_t i = 0; i < keyCount; ++i) {
-        client.print(F("{\"key\":\""));
         uint16_t address = i * 8;
         uint8_t keyLength = EEPROM.read(address++);
+        res += F("{\"key\":\"");
+
         for (uint8_t j = 0; j < keyLength; ++j, ++address) {
             const uint8_t b = EEPROM.read(address);
-
-            client.print(b, HEX);
+            res += byteToHex(b);
             if (j < keyLength - 1) {
-                client.print(":");
+                res += ":";
             }
         }
-        client.print(keyCount <= i + 1 ? F("\"}") : F("\"},"));
+        res += (keyCount <= i + 1 ? F("\"}") : F("\"},"));
     }
-    client.print(F("]}"));
+    res += "]}";
+
+    return res;
 }
 
 bool addKey(MFRC522::Uid *uid) {
@@ -99,30 +118,37 @@ uint8_t findKey(MFRC522::Uid *uid) {
     return UINT8_MAX;
 }
 
-void readLogsForClient(WiFiClient &client) {
+String getLogsJson() {
     const uint8_t logState = EEPROM.read(511);
-    const uint8_t logCount = logState & 0x0F;
+    uint8_t logCount = logState & 0x0F;
     uint8_t logIndex = ((logCount == PERSISTENCY_LOG_ADDRESS_COUNT - 1) ? (logState >> 4) & 0x0F : 0);
+    if (logIndex) {
+        ++logCount;
+    }
+    String res = "{\"logs\": [";
 
-    client.print(F("{\"logs\": ["));
     for (uint8_t i = 0; i < logCount; ++i, ++logIndex) {
-        client.print(F("{\"key\":\""));
         if (PERSISTENCY_LOG_ADDRESS_COUNT <= logIndex) {
             logIndex = logIndex % PERSISTENCY_LOG_ADDRESS_COUNT;
         }
         uint16_t address = logIndex * 8 + PERSISTENCY_LOG_ADDRESS_START;
         uint8_t keyLength = EEPROM.read(address++);
+        res += (keyLength & 0x80 ? F("{\"accepted\": true,") : F("{\"accepted\": false,"));
+        keyLength &= 0x7F;
+        res += "\"key\":\"";
         for (uint8_t j = 0; j < keyLength; ++j, ++address) {
             const uint8_t b = EEPROM.read(address);
 
-            client.print(b, HEX);
+            res += byteToHex(b);
             if (j < keyLength - 1) {
-                client.print(":");
+                res += ":";
             }
         }
-        client.print(logCount <= i + 1 ? F("\"}") : F("\"},"));
+        res += (logCount <= i + 1 ? F("\"}") : F("\"},"));
     }
-    client.print(F("]}"));
+    res += F("]}");
+
+    return res;
 }
 
 void saveLog(MFRC522::Uid *uid) {
@@ -131,7 +157,7 @@ void saveLog(MFRC522::Uid *uid) {
     uint8_t logIndex = (logState >> 4) & 0x0F;
 
     uint16_t address = logIndex * 8 + PERSISTENCY_LOG_ADDRESS_START;
-    EEPROM.write(address, uid->size);
+    EEPROM.write(address, uid->size | (findKey(uid) != UINT8_MAX) << 7);
     for (uint8_t i = 0; i < uid->size; ++i) {
         EEPROM.write(address + i + 1, uid->uidByte[i]);
     }

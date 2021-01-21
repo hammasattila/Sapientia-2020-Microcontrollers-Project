@@ -26,10 +26,30 @@
             box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19);
         }
 
-        #log_container {
+        #log_container,
+        #key_container {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
+        }
+
+        #log_container>.card {
+            min-width: 128px;
+            margin: 4px 8px;
+            flex-grow: 1;
+        }
+
+        #key_container>.card {
+            min-width: 320px;
+            margin: 8px 8px;
+            flex-grow: 1;
+        }
+
+        #log_container>.card.accepted {
+            background-color: #388e3c;
+        }
+
+        #log_container>.card.denied {
+            background-color: #c62828;
         }
     </style>
     <script>
@@ -37,13 +57,11 @@
             fetch("api/logs")
                 .then(response => response.json())
                 .then(data => {
-                    for (const it of document.getElementsByClassName("log")) {
-                        it.remove();
-                    }
+                    document.getElementById("log_container").innerHTML = "";
 
                     for (const it of data.logs) {
                         const card = document.createElement("div");
-                        card.className = "card log";
+                        card.className = `card log ${it.accepted ? "accepted" : "denied"}`;
                         card.appendChild(document.createTextNode(it.key));
                         document.getElementById("log_container").appendChild(card);
                     }
@@ -54,9 +72,7 @@
             fetch("api/keys")
                 .then(response => response.json())
                 .then(data => {
-                    for (const it of document.getElementsByClassName("key")) {
-                        it.remove();
-                    }
+                    document.getElementById("key_container").innerHTML = "";
 
                     for (const [i, it] of data.keys.entries()) {
                         const card = document.createElement("div");
@@ -67,7 +83,7 @@
                         const button = document.createElement("button");
                         button.appendChild(document.createTextNode("Delete"));
                         button.addEventListener("click", event => {
-                            fetch(`/api/remove/${i}`);
+                            fetch(`/api/remove?pos=${i}`);
                         });
                         card.appendChild(button);
                         document.getElementById("key_container").appendChild(card);
@@ -92,7 +108,7 @@
         setInterval(() => {
             keys();
             logs();
-        }, 10000);
+        }, 1000);
     </script>
 </head>
 
@@ -101,7 +117,9 @@
     <div id="key_container" class="container card">
         <h4 class="title">Keys</h4>
     </div>
-    <button onClick="addNextCard();">Add the next card</button>
+    <button onClick="addNextCard();" style="margin:16px auto;padding:16px;display:block;width:512px;">
+        Add the next card
+    </button>
     <div class="container card">
         <h4 class="title">Logs</h4>
         <div id="log_container"></div>
