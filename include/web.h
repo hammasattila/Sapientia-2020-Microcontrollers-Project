@@ -1,19 +1,20 @@
 #ifndef WEB_H
 #define WEB_H
 
-#include <EnviromentVariables.h>
 #include <WiFi.h>
+#include "ESPAsyncWebServer.h"
 
-extern WiFiServer server;
+#include <EnviromentVariables.h>
+
 extern bool addNextCard;
+extern AsyncWebServer server;
+extern const char htmlIndex[];
 
-void handleHttpRequest();
+void setupAsyncWebServer();
 void serveWebPage(WiFiClient &);
 inline void beginJsonResponse(WiFiClient &client) {
     client.println(F("HTTP/1.1 200 OK\r\nContent-type:application/json\r\nConnection: close\r\n"));
 }
-void servKeys(WiFiClient &);
-void servLogs(WiFiClient &);
 void servAdd(WiFiClient &);
 void servRemove(WiFiClient &, uint8_t );
 

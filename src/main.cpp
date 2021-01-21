@@ -2,6 +2,9 @@
 #include <MFRC522.h>
 #include <WiFi.h>
 
+#include "ESPAsyncWebServer.h"
+// #include "AsyncTCP.h"
+
 #include "EnviromentVariables.h"
 #include "persistency.h"
 #include "web.h"
@@ -10,6 +13,15 @@ MFRC522 mfrc522(PIN_CHIP_SELECT_SPI, PIN_RFID_RESET);
 MFRC522::MIFARE_Key key;
 
 void setup() {
+    pinMode(GPIO_NUM_2, OUTPUT);
+    pinMode(GPIO_NUM_33, OUTPUT);
+
+    /// LED TESTING
+    digitalWrite(GPIO_NUM_2, HIGH);
+    digitalWrite(GPIO_NUM_33, HIGH);
+    delay(5000);
+    digitalWrite(GPIO_NUM_2, LOW);
+    digitalWrite(GPIO_NUM_33, LOW);
 
     delay(1000);
 
@@ -38,6 +50,7 @@ void setup() {
     // EEPROM.commit();
 
     /// CONNECTING TIO THE NETWORK.
+    WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PSWD);
     Serial.print(F("Connecting to WiFi"));
     while (WiFi.status() != WL_CONNECTED) {
@@ -51,7 +64,7 @@ void setup() {
 
     /// STARTING WEB SERVER
     Serial.println(F("Starting web server."));
-    server.begin();
+    setupAsyncWebServer();
 
     Serial.println();
     Serial.println(F("#### SYSTEM READY TO GO ####"));
@@ -59,7 +72,7 @@ void setup() {
 }
 
 void loop() {
-    handleHttpRequest();
+    digitalWrite(GPIO_NUM_2, addNextCard);
 
     if (!mfrc522.PICC_IsNewCardPresent()) {
         return;
@@ -71,11 +84,22 @@ void loop() {
 
     // mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
     mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
-    saveLog(&(mfrc522.uid));
-    if(addNextCard) {
+    if (addNextCard) {
         addKey(&(mfrc522.uid));
         addNextCard = false;
     }
-    Serial.println(findKey(&(mfrc522.uid)) != UINT8_MAX ? "ACCEPTED" : "DENNIED");
+    saveLog(&(mfrc522.uid));
+    if (findKey(&(mfrc522.uid)) != UINT8_MAX) {
+        Serial.println(F("ACCEPTED"));
+        digitalWrite(GPIO_NUM_33, HIGH);
+        delay(1000);
+        digitalWrite(GPIO_NUM_33, LOW);
+    } else {
+        Serial.println(F("DENNIED"));
+        digitalWrite(GPIO_NUM_2, HIGH);
+        delay(1000);
+        digitalWrite(GPIO_NUM_2, LOW);
+    }
     mfrc522.PICC_HaltA();
+    sleep(1);
 }

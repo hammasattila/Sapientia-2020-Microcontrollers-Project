@@ -2,10 +2,10 @@
 #include <MFRC522.h>
 #include <WiFi.h>
 
-void readKeysForClient(WiFiClient &);
+String getKeysJson();
 uint8_t findKey(MFRC522::Uid *);
 bool addKey(MFRC522::Uid *);
 bool removeKey(uint8_t);
 
-void readLogsForClient(WiFiClient &);
+String getLogsJson();
 void saveLog(MFRC522::Uid *);
